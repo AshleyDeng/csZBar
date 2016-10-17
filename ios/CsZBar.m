@@ -109,7 +109,7 @@
             self.scanReader.cameraOverlayView = polygonView;
         }
 
-        [self.viewController presentViewController:self.scanReader animated:YES completion:nil];
+        [self.viewController presentViewController:self.scanReader animated:NO completion:nil];
     }
 }
 
@@ -152,7 +152,7 @@
     ZBarSymbol *symbol = nil;
     for (symbol in results) break; // get the first result
 
-    [self.scanReader dismissViewControllerAnimated: YES completion: ^(void) {
+    [self.scanReader dismissViewControllerAnimated: NO completion: ^(void) {
         self.scanInProgress = NO;
         [self sendScanResult: [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
@@ -161,7 +161,7 @@
 }
 
 - (void) imagePickerControllerDidCancel:(UIImagePickerController*)picker {
-    [self.scanReader dismissViewControllerAnimated: YES completion: ^(void) {
+    [self.scanReader dismissViewControllerAnimated: NO completion: ^(void) {
         self.scanInProgress = NO;
         [self sendScanResult: [CDVPluginResult
                                 resultWithStatus: CDVCommandStatus_ERROR
@@ -170,7 +170,7 @@
 }
 
 - (void) readerControllerDidFailToRead:(ZBarReaderController*)reader withRetry:(BOOL)retry {
-    [self.scanReader dismissViewControllerAnimated: YES completion: ^(void) {
+    [self.scanReader dismissViewControllerAnimated: NO completion: ^(void) {
         self.scanInProgress = NO;
         [self sendScanResult: [CDVPluginResult
                                 resultWithStatus: CDVCommandStatus_ERROR

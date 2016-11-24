@@ -164,6 +164,7 @@ implements SurfaceHolder.Callback {
             // Draw/hide the sight
             if(!drawSight) {
                 findViewById(getResourceId("id/csZbarScannerSight")).setVisibility(View.INVISIBLE);
+                findViewById(getResourceId("id/csZbarScannerSightVertical")).setVisibility(View.INVISIBLE);
             }
 
             // Create preview SurfaceView

@@ -105,6 +105,10 @@
             UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0,dim / 2, dim, 1)];
             lineView.backgroundColor = [UIColor redColor];
             [polygonView addSubview:lineView];
+            
+            UIView *lineViewVertical = [[UIView alloc] initWithFrame:CGRectMake(dim / 2, 0, 1, dim)];
+            lineViewVertical.backgroundColor = [UIColor redColor];
+            [polygonView addSubview:lineViewVertical];
 
             self.scanReader.cameraOverlayView = polygonView;
         }

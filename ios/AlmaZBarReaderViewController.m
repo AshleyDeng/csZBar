@@ -16,25 +16,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    //[button setTitle:@"Flash" forState:UIControlStateNormal];
-    [button sizeToFit];
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    //[button setContentEdgeInsets:UIEdgeInsetsMake(20, 30, 20, 30)];
-    CGRect frame;
-    
-    if (screenRect.size.height > (screenRect.size.width)) {
-        frame = CGRectMake(0,0, screenRect.size.width*(0.15), screenRect.size.height*0.15);
-    }else{
-        frame = CGRectMake(0,0, screenRect.size.width*(0.10), screenRect.size.height*0.20);
-    }
-    
-    button.frame =frame;
-    button.layer.cornerRadius = 10;
-    button.clipsToBounds = YES;
-    
-    [button addTarget:self action:@selector(buttonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:button];
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -46,15 +27,8 @@
     // Dispose of any resources that can be recreated.
 }
 
-//Techedge Changes NSS fase 2
-- (void)buttonPressed: (UIButton *) button {
-    CsZBar *obj = [[CsZBar alloc] init];
-    
-    [obj toggleflash];
-}
-
 - (BOOL)shouldAutorotate{
-    return YES;
+    return NO;
 }
 
 - (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation) fromInterfaceOrientation {

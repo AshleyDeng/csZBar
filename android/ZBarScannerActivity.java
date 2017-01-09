@@ -245,7 +245,10 @@ implements SurfaceHolder.Callback {
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
-        camera.setDisplayOrientation(result);
+        
+        if(camera != null) {
+            camera.setDisplayOrientation(result);
+        }
     }
     @Override
     public void onPause ()

@@ -181,30 +181,14 @@
     ZBarSymbol *symbol = nil;
     for (symbol in results) break; // get the first result
     NSLog(@"%@", symbol.data);
-
-//    [self.scanReader dismissViewControllerAnimated: NO completion: ^(void) {
-//        self.scanInProgress = NO;
-//        [self sendScanResult: [CDVPluginResult
-//                               resultWithStatus: CDVCommandStatus_OK
-//                               messageAsString: symbol.data]];
-//    }];
-    
-//    self.scanInProgress = NO;
-    [self sendScanResult: [CDVPluginResult
-                           resultWithStatus: CDVCommandStatus_OK
-                           messageAsString: symbol.data]];
-//    [self.scanReader.view removeFromSuperview];
     
     count++;
     NSLog(@"%d", count);
-}
 
-- (void)didReceiveMemoryWarning {
-    NSLog(@"CsZbar Memory Warning");
-    [self.scanReader didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
+    [self sendScanResult: [CDVPluginResult
+                           resultWithStatus: CDVCommandStatus_OK
+                           messageAsString: symbol.data]];
 }
-
 
 - (void) imagePickerControllerDidCancel:(UIImagePickerController*)picker {    
     self.scanInProgress = NO;
@@ -215,12 +199,10 @@
 }
 
 - (void) readerControllerDidFailToRead:(ZBarReaderController*)reader withRetry:(BOOL)retry {
-    [self.scanReader dismissViewControllerAnimated: NO completion: ^(void) {
-        self.scanInProgress = NO;
-        [self sendScanResult: [CDVPluginResult
-                                resultWithStatus: CDVCommandStatus_ERROR
-                                messageAsString: @"Failed"]];
-    }];
-}
+    self.scanInProgress = NO;
+    [self sendScanResult: [CDVPluginResult
+                           resultWithStatus: CDVCommandStatus_ERROR
+                           messageAsString: @"Failed"]];
+    [self.scanReader.view removeFromSuperview];}
 
 @end

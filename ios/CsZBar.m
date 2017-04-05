@@ -57,6 +57,14 @@
     }
 }
 
+- (void)cancel {
+    self.scanInProgress = NO;
+    [self sendScanResult: [CDVPluginResult
+                           resultWithStatus: CDVCommandStatus_ERROR
+                           messageAsString: @"cancelled"]];
+    [self.scanReader.view removeFromSuperview];
+}
+
 - (void)handleUserParams: (NSDictionary*)params {
     // Get user parameters
     NSString *camera = [params objectForKey:@"camera"];

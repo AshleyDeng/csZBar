@@ -18,6 +18,15 @@ ZBar.prototype = {
         exec(success, failure, 'CsZBar', 'scan', [params]);
     },
 
+    cancel: function () {
+        return new Promise(function(resolve, reject) {
+            exec(function(message) {
+                resolve(message);
+            }, function(message) {
+                reject(message);
+            }, 'CsZBar', 'cancel', null);
+        });
+    },
 };
 
 module.exports = new ZBar;

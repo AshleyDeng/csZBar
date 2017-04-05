@@ -6,9 +6,7 @@
 @interface CsZBar : CDVPlugin <ZBarReaderDelegate>
 
 - (void)scan: (CDVInvokedUrlCommand*)command;
+- (void)cancel: (CDVInvokedUrlCommand*)command;
 - (void)toggleflash;
-- (void)cancel;
-
-
 
 @end

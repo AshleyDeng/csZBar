@@ -57,7 +57,7 @@
     }
 }
 
-- (void)cancel {
+- (void)cancel: (CDVInvokedUrlCommand*)command {
     self.scanInProgress = NO;
     [self sendScanResult: [CDVPluginResult
                            resultWithStatus: CDVCommandStatus_ERROR

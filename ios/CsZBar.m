@@ -48,9 +48,9 @@
         
         NSDictionary *params = (NSDictionary*) [command argumentAtIndex:0];
         [self handleUserParams: params];
-        [self hideInfoButton];
-        [self drawSight: params];
-        [self addFlashButton];
+        [self hideToolBar];
+//        [self drawSight: params];
+        [self addButtons];
         [self configView];
         
         [self.viewController.view addSubview:self.scanReader.view];
@@ -86,41 +86,47 @@
     }
 }
 
-- (void)hideInfoButton {
+- (void)hideToolBar {
     // Hack to hide the bottom bar's Info button... originally based on http://stackoverflow.com/a/16353530
     NSInteger infoButtonIndex;
+
     if ([[[UIDevice currentDevice] systemVersion] compare:@"10.0" options:NSNumericSearch] != NSOrderedAscending) {
-        infoButtonIndex = 1;
+        infoButtonIndex = 0;
     } else {
         infoButtonIndex = 3;
     }
-    UIView *infoButton = [[[[[self.scanReader.view.subviews objectAtIndex:2] subviews] objectAtIndex:0] subviews] objectAtIndex:infoButtonIndex];
-    [infoButton setHidden:YES];
+    
+    UIView *bottomBar = [self.scanReader.view.subviews objectAtIndex:2];
+    [bottomBar setHidden:YES];
 }
 
-- (void)addFlashButton {
+- (void)addButtons {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenWidth = screenRect.size.width;
     CGFloat screenHeight = screenRect.size.height;
     
-    UIToolbar *toolbarViewFlash = [[UIToolbar alloc] init];
-    [toolbarViewFlash setBackgroundImage:[UIImage new]
+    UIToolbar *toolbarView = [[UIToolbar alloc] init];
+    [toolbarView setBackgroundImage:[UIImage new]
                       forToolbarPosition:UIBarPositionAny
                               barMetrics:UIBarMetricsDefault];
-    [toolbarViewFlash setShadowImage:[UIImage new]
+    [toolbarView setShadowImage:[UIImage new]
               forToolbarPosition:UIBarPositionAny];
     
     //The bar length it depends on the orientation
-    toolbarViewFlash.frame = CGRectMake(screenWidth - 75, 10, (screenWidth > screenHeight ? screenWidth : screenHeight), 44.0);
+    toolbarView.frame = CGRectMake(0, 10, (screenWidth > screenHeight ? screenWidth : screenHeight), 44.0);
+
     UIBarButtonItem *buttonFlash = [[UIBarButtonItem alloc] initWithTitle:@"Flash" style:UIBarButtonItemStyleDone target:self action:@selector(toggleflash)];
+    UIBarButtonItem *buttonCancel = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancel:)];
+
     
-    NSArray *buttons = [NSArray arrayWithObjects: buttonFlash, nil];
-    [toolbarViewFlash setItems:buttons animated:NO];
-    [self.scanReader.view addSubview:toolbarViewFlash];
+    NSArray *buttons = [NSArray arrayWithObjects: buttonFlash, buttonCancel, nil];
+    [toolbarView setItems:buttons animated:YES];
+    [self.scanReader.view addSubview:toolbarView];
 }
 
 - (void)drawSight: (NSDictionary*)params {
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+//    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect = self.scanReader.view.bounds;
     CGFloat screenWidth = screenRect.size.width;
     CGFloat screenHeight = screenRect.size.height / 2.0;
     
@@ -128,11 +134,11 @@
     if (drawSight) {
         UIView *polygonView = [[UIView alloc] initWithFrame: CGRectMake  (0, 0, screenWidth, screenHeight)];
         
-        UIView *lineViewHorizontal = [[UIView alloc] initWithFrame:CGRectMake(10, screenHeight / 2, screenWidth - 20, 1)];
+        UIView *lineViewHorizontal = [[UIView alloc] initWithFrame:CGRectMake(10, screenHeight / 2, screenWidth - 10, 1)];
         lineViewHorizontal.backgroundColor = [UIColor redColor];
         [polygonView addSubview:lineViewHorizontal];
         
-        UIView *lineViewVertical = [[UIView alloc] initWithFrame:CGRectMake(screenWidth / 2, 30, 1, screenHeight - 60)];
+        UIView *lineViewVertical = [[UIView alloc] initWithFrame:CGRectMake(screenWidth / 2, 30, 1, screenHeight - 40)];
         lineViewVertical.backgroundColor = [UIColor redColor];
         [polygonView addSubview:lineViewVertical];
         
@@ -144,11 +150,13 @@
     CGRect frame = self.scanReader.view.frame;
     frame.size.width = [[UIScreen mainScreen] bounds].size.width;
     frame.size.height = [[UIScreen mainScreen] bounds].size.height / 2.0;
+    
     self.scanReader.view.frame = frame;
+    self.scanReader.view.subviews.firstObject.frame = frame;
 }
 
 - (void)toggleflash {
-    NSLog(@"Toggle");
+//    NSLog(@"Toggle");
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     
     [device lockForConfiguration:nil];

@@ -49,7 +49,7 @@
         NSDictionary *params = (NSDictionary*) [command argumentAtIndex:0];
         [self handleUserParams: params];
         [self hideToolBar];
-//        [self drawSight: params];
+        [self drawSight: params];
         [self addButtons];
         [self configView];
         
@@ -96,8 +96,9 @@
         infoButtonIndex = 3;
     }
     
+    // Remove the bottomBar from the UI Stack as we're replacing it.
     UIView *bottomBar = [self.scanReader.view.subviews objectAtIndex:2];
-    [bottomBar setHidden:YES];
+    [bottomBar removeFromSuperview];
 }
 
 - (void)addButtons {
@@ -106,39 +107,42 @@
     CGFloat screenHeight = screenRect.size.height;
     
     UIToolbar *toolbarView = [[UIToolbar alloc] init];
-    [toolbarView setBackgroundImage:[UIImage new]
-                      forToolbarPosition:UIBarPositionAny
-                              barMetrics:UIBarMetricsDefault];
-    [toolbarView setShadowImage:[UIImage new]
-              forToolbarPosition:UIBarPositionAny];
+    [toolbarView setBackgroundImage:[UIImage new] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+    [toolbarView setShadowImage:[UIImage new] forToolbarPosition:UIBarPositionAny];
     
     //The bar length it depends on the orientation
-    toolbarView.frame = CGRectMake(0, 10, (screenWidth > screenHeight ? screenWidth : screenHeight), 44.0);
-
-    UIBarButtonItem *buttonFlash = [[UIBarButtonItem alloc] initWithTitle:@"Flash" style:UIBarButtonItemStyleDone target:self action:@selector(toggleflash)];
-    UIBarButtonItem *buttonCancel = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancel:)];
-
-    
-    NSArray *buttons = [NSArray arrayWithObjects: buttonFlash, buttonCancel, nil];
-    [toolbarView setItems:buttons animated:YES];
+    toolbarView.frame = CGRectMake(0, (screenHeight / 2) - 44.0, screenWidth, 44.0);
     [self.scanReader.view addSubview:toolbarView];
+    
+    UIBarButtonItem *buttonFlash = [[UIBarButtonItem alloc] initWithTitle:@"Flash" style:UIBarButtonItemStyleDone target:self action:@selector(toggleflash)];
+    buttonFlash.tag = 1;
+    
+    UIBarButtonItem *buttonCancel = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:@selector(cancel:)];
+    buttonCancel.tag = 2;
+    
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
+    UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    fixedSpace.width = 10.0f;
+    
+    NSArray *buttons = [NSArray arrayWithObjects: fixedSpace, buttonFlash, flexSpace, buttonCancel, fixedSpace, nil];
+    [toolbarView setItems:buttons animated:NO];
 }
 
 - (void)drawSight: (NSDictionary*)params {
-//    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGRect screenRect = self.scanReader.view.bounds;
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenWidth = screenRect.size.width;
     CGFloat screenHeight = screenRect.size.height / 2.0;
     
     BOOL drawSight = [params objectForKey:@"drawSight"] ? [[params objectForKey:@"drawSight"] boolValue] : true;
     if (drawSight) {
-        UIView *polygonView = [[UIView alloc] initWithFrame: CGRectMake  (0, 0, screenWidth, screenHeight)];
+        UIView *polygonView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, screenWidth, screenHeight)];
         
-        UIView *lineViewHorizontal = [[UIView alloc] initWithFrame:CGRectMake(10, screenHeight / 2, screenWidth - 10, 1)];
+        UIView *lineViewHorizontal = [[UIView alloc] initWithFrame:CGRectMake(10, (screenHeight / 2) + 1, screenWidth - 20, 1)];
         lineViewHorizontal.backgroundColor = [UIColor redColor];
         [polygonView addSubview:lineViewHorizontal];
         
-        UIView *lineViewVertical = [[UIView alloc] initWithFrame:CGRectMake(screenWidth / 2, 30, 1, screenHeight - 40)];
+        UIView *lineViewVertical = [[UIView alloc] initWithFrame:CGRectMake((screenWidth / 2) + 1, 30, 1, screenHeight - 50)];
         lineViewVertical.backgroundColor = [UIColor redColor];
         [polygonView addSubview:lineViewVertical];
         
@@ -152,6 +156,7 @@
     frame.size.height = [[UIScreen mainScreen] bounds].size.height / 2.0;
     
     self.scanReader.view.frame = frame;
+    // Make the camera view the same size and the container view
     self.scanReader.view.subviews.firstObject.frame = frame;
 }
 

@@ -54,7 +54,6 @@ public class ZBar extends CordovaPlugin {
             return true;
 
         } else if (action.equals("cancel")) {
-            Log.d("csZbar", "cancel signal");
             Intent killIntent = new Intent(appCtx, ZBarScannerActivity.class);
             killIntent.putExtra("killExtra", true);
             cordova.getActivity().startActivity(killIntent);
@@ -73,31 +72,6 @@ public class ZBar extends CordovaPlugin {
 
 
     // External results handler ----------------------------------------
-
-    /* Do not use if want to keep scanner activity alive
-    @Override
-    public void onActivityResult (int requestCode, int resultCode, Intent result)
-    {
-        if(requestCode == SCAN_CODE) {
-            switch(resultCode) {
-                case Activity.RESULT_OK:
-                    String barcodeValue = result.getStringExtra(ZBarScannerActivity.EXTRA_QRVALUE);
-                    scanCallbackContext.success(barcodeValue);
-                    break;
-                case Activity.RESULT_CANCELED:
-                    scanCallbackContext.error("cancelled");
-                    break;
-                case ZBarScannerActivity.RESULT_ERROR:
-                    scanCallbackContext.error("Scan failed due to an error");
-                    break;
-                default:
-                    scanCallbackContext.error("Unknown error");
-            }
-            isInProgress = false;
-            //scanCallbackContext = null;
-        }
-    }
-    */
 
     //receive multiple scan events while keeping scanner activity alive
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {

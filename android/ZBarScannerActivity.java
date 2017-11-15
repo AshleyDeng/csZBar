@@ -144,13 +144,14 @@ implements SurfaceHolder.Callback {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         //Log.i("csZBar", "height:" + Integer.toString(height) + "width:" + Integer.toString(width));
-        height = (int) (height * heightFloat + getStatusBarHeight());
+        height = (int) (height * heightFloat /* + getStatusBarHeight() */);
         surfH = height;
         surfW = width;
         Window window = getWindow();
         window.setGravity(Gravity.TOP);
         window.setLayout(width, height);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.getDecorView().requestFocus();
 
     }

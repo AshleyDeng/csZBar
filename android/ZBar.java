@@ -16,14 +16,12 @@ import android.content.BroadcastReceiver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-
 import org.cloudsky.cordovaPlugins.ZBarScannerActivity;
 
 public class ZBar extends CordovaPlugin {
 
     // Configuration ---------------------------------------------------
 
-    private static int SCAN_CODE = 1;
     private Context appCtx;
 
     // State -----------------------------------------------------------
@@ -34,9 +32,7 @@ public class ZBar extends CordovaPlugin {
     // Plugin API ------------------------------------------------------
 
     @Override
-    public boolean execute (String action, JSONArray args, CallbackContext callbackContext)
-    throws JSONException
-    {
+    public boolean execute (String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         appCtx = cordova.getActivity().getApplicationContext();
         
         if(action.equals("scan")) {
@@ -45,10 +41,12 @@ public class ZBar extends CordovaPlugin {
             scanIntent.putExtra(ZBarScannerActivity.EXTRA_PARAMS, params.toString());
         
             scanCallbackContext = callbackContext; 
+
             if (!isReceiverRegistered) {
                 LocalBroadcastManager.getInstance(appCtx).registerReceiver(mMessageReceiver, new IntentFilter("scanner"));
                 isReceiverRegistered = true;
             }
+
             scanIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             cordova.getActivity().startActivity(scanIntent);
             return true;
@@ -69,7 +67,6 @@ public class ZBar extends CordovaPlugin {
     public void onDestroy() {
         LocalBroadcastManager.getInstance(appCtx).unregisterReceiver(mMessageReceiver);
     }
-
 
     // External results handler ----------------------------------------
 
@@ -101,5 +98,4 @@ public class ZBar extends CordovaPlugin {
             }
         }
       };
-
 }

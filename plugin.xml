@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-cszbar" version="1.5.0">
+        id="cordova-plugin-cszbar" version="1.6.0">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -26,8 +26,8 @@
         <config-file target="AndroidManifest.xml" parent="application">
         <activity android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
                 android:name="org.cloudsky.cordovaPlugins.ZBarScannerActivity"
-                android:screenOrientation="fullUser"
-                android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
+                android:screenOrientation="portrait" android:launchMode="singleTask"
+                android:theme="@android:style/Theme.Holo.Panel" />
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-feature android:name="android.hardware.camera" />
@@ -35,10 +35,9 @@
             <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
             <uses-feature android:name="android.hardware.camera.front" android:required="false" />
             <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.REORDER_TASKS" />
         </config-file>
         <config-file target="res/values/strings.xml" parent="/*">
-            <string name="csZbarScannerTitle">Scan QR Code</string>
-            <string name="csZbarScannerInstructions">Please point your camera at the QR code.</string>
             <color name="csZbarScannerTextColor">#ffffff</color>
             <color name="csZbarScannerTextBackground">#88000000</color>
             <color name="csZbarScannerBackground">#000000</color>

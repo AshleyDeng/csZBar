@@ -143,8 +143,7 @@ implements SurfaceHolder.Callback {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        //Log.i("csZBar", "height:" + Integer.toString(height) + "width:" + Integer.toString(width));
-        height = (int) (height * heightFloat /* + getStatusBarHeight() */);
+        height = (int) (height * heightFloat + getStatusBarHeight());
         surfH = height;
         surfW = width;
         Window window = getWindow();
@@ -164,8 +163,6 @@ implements SurfaceHolder.Callback {
         int contentViewTop =
                 window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
         int titleBarHeight= contentViewTop - statusBarHeight;
-
-        //Log.i("csZbar ", "StatusBar Height= " + statusBarHeight + " , TitleBar Height = " + titleBarHeight);
         return titleBarHeight;
     }
 

@@ -147,7 +147,6 @@ implements SurfaceHolder.Callback {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        //Log.i("csZBar", "height:" + Integer.toString(height) + "width:" + Integer.toString(width));
         height = (int) (height * heightFloat + getStatusBarHeight() );
         surfH = height;
         surfW = width;
@@ -156,6 +155,7 @@ implements SurfaceHolder.Callback {
         window.setLayout(width, height);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
         window.getDecorView().requestFocus();
 
     }
@@ -168,8 +168,6 @@ implements SurfaceHolder.Callback {
         int contentViewTop =
                 window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
         int titleBarHeight= contentViewTop - statusBarHeight;
-
-        //Log.i("csZbar ", "StatusBar Height= " + statusBarHeight + " , TitleBar Height = " + titleBarHeight);
         return titleBarHeight;
     }
 
@@ -476,11 +474,6 @@ implements SurfaceHolder.Callback {
                     Intent result = new Intent ("scanner");
                     result.putExtra(EXTRA_QRVALUE, qrValue);
                     result.putExtra("EXTRA_RESULT", EXTRA_RESULT_OK);
-                    //Use if one time action and want to close scanner
-                    //setResult(Activity.RESULT_OK, result);
-                    //finish();
-
-                    //Use if want to keep scanner open
                     boolean messageSent = sendMessage(result);
                 
                 }

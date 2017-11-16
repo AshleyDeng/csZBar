@@ -279,11 +279,13 @@ implements SurfaceHolder.Callback {
     {
         super.onResume();
 
-        openCamera();
-
-        supportedPreviewSizes = camera.getParameters().getSupportedPreviewSizes();
-
-        tryStartPreview();
+        try {
+            openCamera();
+            supportedPreviewSizes = camera.getParameters().getSupportedPreviewSizes();
+            tryStartPreview();
+        } catch (NullPointerException e) {
+            die ("Camera is not setup");
+        }
     }
 
     private void openCamera() {
@@ -409,7 +411,7 @@ implements SurfaceHolder.Callback {
     }
 
     public void toggleFlash(View view) {
-		camera.startPreview();
+        camera.startPreview();
         android.hardware.Camera.Parameters camParams = camera.getParameters();
         //If the flash is set to off
         try {

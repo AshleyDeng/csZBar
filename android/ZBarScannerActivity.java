@@ -547,8 +547,7 @@ implements SurfaceHolder.Callback {
 
                 try {
                     android.hardware.Camera.Parameters camParams = camera.getParameters();
-                    int previewSizeMin = Math.min(surfW, surfH);
-                    camParams.setPreviewSize(previewSizeMin, previewSizeMin);
+                    camParams.setPreviewSize(surfW, surfH);
                     camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                     camera.setParameters(camParams);
                 } catch (Exception e) {

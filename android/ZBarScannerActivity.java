@@ -107,6 +107,18 @@ implements SurfaceHolder.Callback {
     @Override
     public void onCreate (Bundle savedInstanceState) {
         
+        try {
+            if (intent.getStringExtra("killExtra").contains("kill")) {
+                Intent dieIntent = new Intent("scanner");
+                dieIntent.putExtra("EXTRA_RESULT", EXTRA_RESULT_CANCEL);
+                sendMessage(dieIntent);
+                finish(); //immediately kill activity
+                return //do not continue with remainder of onCreate
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+
         if ((this.getIntent().getFlags() | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) > 0) {
             ActivityManager tasksManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
             tasksManager.moveTaskToFront(getTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
@@ -134,7 +146,6 @@ implements SurfaceHolder.Callback {
         super.onNewIntent(intent);
 
         try {
-            Log.d("csZbar New Intent", intent.getStringExtra("killExtra"));
             if (intent.getStringExtra("killExtra").contains("kill")) onBackPressed();
         } catch (Exception e) {
             //do nothing

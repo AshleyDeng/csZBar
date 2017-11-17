@@ -106,8 +106,6 @@ implements SurfaceHolder.Callback {
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
-
-        if (this.getIntent().getBooleanExtra("killExtra", false)) onBackPressed();
         
         if ((this.getIntent().getFlags() | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) > 0) {
             ActivityManager tasksManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -135,6 +133,12 @@ implements SurfaceHolder.Callback {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        try {
+            Log.d("csZbar New Intent", intent.getStringExtra("killExtra"));
+            if (intent.getStringExtra("killExtra").contains("kill")) onBackPressed();
+        } catch (Exception e) {
+            //do nothing
+        }
     }
 
     private void setWindowParams(float heightFloat) {
@@ -143,7 +147,7 @@ implements SurfaceHolder.Callback {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        height = (int) (height * heightFloat + getStatusBarHeight());
+        height = (int) (height * heightFloat + getStatusBarHeight() );
         surfH = height;
         surfW = width;
         Window window = getWindow();
@@ -151,6 +155,7 @@ implements SurfaceHolder.Callback {
         window.setLayout(width, height);
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
         window.getDecorView().requestFocus();
 
     }
@@ -235,7 +240,6 @@ implements SurfaceHolder.Callback {
             public void onSizeChanged (int w, int h, int oldW, int oldH) {
                 surfW = w;
                 surfH = h;
-                //matchSurfaceToPreviewRatio();
             }
 
             @Override
@@ -275,11 +279,13 @@ implements SurfaceHolder.Callback {
     {
         super.onResume();
 
-        openCamera();
-
-        supportedPreviewSizes = camera.getParameters().getSupportedPreviewSizes();
-
-        tryStartPreview();
+        try {
+            openCamera();
+            supportedPreviewSizes = camera.getParameters().getSupportedPreviewSizes();
+            tryStartPreview();
+        } catch (NullPointerException e) {
+            die ("Camera is not setup");
+        }
     }
 
     private void openCamera() {
@@ -389,12 +395,6 @@ implements SurfaceHolder.Callback {
         // Sanity check - holder must have a surface...
         if(hld.getSurface() == null) die("There is no camera surface");
 
-        /* Not useful for square preview 
-        surfW = w;
-        surfH = h;
-        matchSurfaceToPreviewRatio();
-        */
-
         tryStopPreview();
         holder = hld;
         tryStartPreview();
@@ -411,7 +411,7 @@ implements SurfaceHolder.Callback {
     }
 
     public void toggleFlash(View view) {
-		camera.startPreview();
+        camera.startPreview();
         android.hardware.Camera.Parameters camParams = camera.getParameters();
         //If the flash is set to off
         try {
@@ -467,27 +467,18 @@ implements SurfaceHolder.Callback {
 
             if (scanner.scanImage(barcode) != 0) {
                 String qrValue = "";
-
                 SymbolSet syms = scanner.getResults();
+
                 for (Symbol sym : syms) {
                     qrValue = sym.getData();
                     
-                    if (lastScanResultTime < (System.currentTimeMillis() - 1500)) {
-                        // Return 1st found QR code value to the calling Activity.
-                        Intent result = new Intent ("scanner");
-                        result.putExtra(EXTRA_QRVALUE, qrValue);
-                        result.putExtra("EXTRA_RESULT", EXTRA_RESULT_OK);
-                        //Use if one time action and want to close scanner
-                        //setResult(Activity.RESULT_OK, result);
-                        //finish();
-
-                        //Use if want to keep scanner open
-                        boolean messageSent = sendMessage(result);
-                        lastScanResultTime = System.currentTimeMillis();
-                    }
-                    
+                    // Return 1st found QR code value to the calling Activity.
+                    Intent result = new Intent ("scanner");
+                    result.putExtra(EXTRA_QRVALUE, qrValue);
+                    result.putExtra("EXTRA_RESULT", EXTRA_RESULT_OK);
+                    boolean messageSent = sendMessage(result);
+                
                 }
-
             }
         }
     };
@@ -527,33 +518,6 @@ implements SurfaceHolder.Callback {
         }
     }
 
-    // Match the aspect ratio of the preview SurfaceView with the camera's preview aspect ratio,
-    // so that the displayed preview is not stretched/squashed.
-    private void matchSurfaceToPreviewRatio () {
-        if(camera == null) return;
-        if(surfW == 0 || surfH == 0) return;
-
-        // Resize SurfaceView to match camera preview ratio (avoid stretching).
-        Camera.Parameters params = camera.getParameters();
-        Camera.Size size = params.getPreviewSize();
-        float previewRatio = (float) size.height / size.width; // swap h and w as the preview is rotated 90 degrees
-        float surfaceRatio = (float) surfW / surfH;
-
-        if(previewRatio > surfaceRatio) {
-            scannerSurface.setLayoutParams(new FrameLayout.LayoutParams(
-                surfW,
-                Math.round((float) surfW / previewRatio),
-                Gravity.CENTER
-            ));
-        } else if(previewRatio < surfaceRatio) {
-            scannerSurface.setLayoutParams(new FrameLayout.LayoutParams(
-                Math.round((float) surfH * previewRatio),
-                surfH,
-                Gravity.CENTER
-            ));
-        }
-    }
-
     // Stop the camera preview safely.
     private void tryStopPreview () {
         // Stop camera preview before making changes.
@@ -571,7 +535,6 @@ implements SurfaceHolder.Callback {
         return mFormats;
     }
 
-
     // Start the camera preview if possible.
     // If start is attempted but fails, exit with error message.
     private void tryStartPreview () {
@@ -584,8 +547,7 @@ implements SurfaceHolder.Callback {
 
                 try {
                     android.hardware.Camera.Parameters camParams = camera.getParameters();
-                    int previewSizeMin = Math.min(surfW, surfH);
-                    camParams.setPreviewSize(previewSizeMin, previewSizeMin);
+                    camParams.setPreviewSize(surfW, surfH);
                     camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                     camera.setParameters(camParams);
                 } catch (Exception e) {
@@ -623,7 +585,6 @@ implements SurfaceHolder.Callback {
 
         for (Camera.Size size : sizes) {
             double ratio = (double) size.width / size.height;
-            //Log.d("csZbar Ratio:", "Width: " + Double.toString(size.width) + "Height: " + Double.toString(size.height));
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
             if (Math.abs(size.height - targetHeight) < minDiff) {
                 optimalSize = size;
@@ -640,7 +601,6 @@ implements SurfaceHolder.Callback {
                 }
             }
         }
-        //Log.d("csZbar Optimal Size:", "Width: " + Double.toString(optimalSize.width) + "Height: " + Double.toString(optimalSize.height));
         
         return optimalSize;
     }

@@ -257,7 +257,7 @@ implements SurfaceHolder.Callback {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-                final int width = (int) (getMeasuredWidth());
+                final int width = getMeasuredWidth();
                 final int height = getMeasuredHeight();
                 
                 setMeasuredDimension(width, height);
@@ -561,7 +561,8 @@ implements SurfaceHolder.Callback {
 
                 try {
                     android.hardware.Camera.Parameters camParams = camera.getParameters();
-                    camParams.setPreviewSize(surfW, surfH);
+                    camParams.set("orientation", "portrait");
+                    camParams.setPreviewSize(previewSize.width, previewSize.height);
                     camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                     camera.setParameters(camParams);
                 } catch (Exception e) {

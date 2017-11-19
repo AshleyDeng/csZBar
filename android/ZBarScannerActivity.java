@@ -71,6 +71,7 @@ implements SurfaceHolder.Callback {
     public static final int EXTRA_RESULT_ERROR = -1;
     public static final int RESULT_ERROR = RESULT_FIRST_USER + 1;
     private static final int CAMERA_PERMISSION_REQUEST = 1;
+
     // State -----------------------------------------------------------
 
     private Camera camera;
@@ -83,7 +84,7 @@ implements SurfaceHolder.Callback {
     private Camera.Size previewSize;
     private BroadcastReceiver screenReceiver;
     private Boolean isCameraSetup = false;
-    private long lastScanResultTime = 0;
+    private String oldBarcode = "0";
 
     // Customisable stuff
     String whichCamera;
@@ -107,6 +108,18 @@ implements SurfaceHolder.Callback {
     @Override
     public void onCreate (Bundle savedInstanceState) {
         
+        try {
+            if (this.getIntent().getStringExtra("killExtra").contains("kill")) {
+                Intent dieIntent = new Intent("scanner");
+                dieIntent.putExtra("EXTRA_RESULT", EXTRA_RESULT_CANCEL);
+                sendMessage(dieIntent);
+                finish(); //immediately kill activity
+                return; //do not continue with remainder of onCreate
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+
         if ((this.getIntent().getFlags() | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) > 0) {
             ActivityManager tasksManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
             tasksManager.moveTaskToFront(getTaskId(), ActivityManager.MOVE_TASK_NO_USER_ACTION);
@@ -134,7 +147,6 @@ implements SurfaceHolder.Callback {
         super.onNewIntent(intent);
 
         try {
-            Log.d("csZbar New Intent", intent.getStringExtra("killExtra"));
             if (intent.getStringExtra("killExtra").contains("kill")) onBackPressed();
         } catch (Exception e) {
             //do nothing
@@ -245,7 +257,7 @@ implements SurfaceHolder.Callback {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-                final int width = (int) (getMeasuredWidth());
+                final int width = getMeasuredWidth();
                 final int height = getMeasuredHeight();
                 
                 setMeasuredDimension(width, height);
@@ -471,13 +483,15 @@ implements SurfaceHolder.Callback {
 
                 for (Symbol sym : syms) {
                     qrValue = sym.getData();
-                    
-                    // Return 1st found QR code value to the calling Activity.
-                    Intent result = new Intent ("scanner");
-                    result.putExtra(EXTRA_QRVALUE, qrValue);
-                    result.putExtra("EXTRA_RESULT", EXTRA_RESULT_OK);
-                    boolean messageSent = sendMessage(result);
-                
+                    Log.d("cszbar", "Code: " + qrValue + " Old Code: " + oldBarcode);
+                    if (qrValue.equalsIgnoreCase(oldBarcode)) {
+                        // Return 1st found QR code value to the calling Activity if two frames match
+                        Intent result = new Intent ("scanner");
+                        result.putExtra(EXTRA_QRVALUE, qrValue);
+                        result.putExtra("EXTRA_RESULT", EXTRA_RESULT_OK);
+                        boolean messageSent = sendMessage(result);
+                    }
+                    oldBarcode = qrValue;                                        
                 }
             }
         }
@@ -547,7 +561,8 @@ implements SurfaceHolder.Callback {
 
                 try {
                     android.hardware.Camera.Parameters camParams = camera.getParameters();
-                    camParams.setPreviewSize(surfW, surfH);
+                    camParams.set("orientation", "portrait");
+                    camParams.setPreviewSize(previewSize.width, previewSize.height);
                     camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                     camera.setParameters(camParams);
                 } catch (Exception e) {

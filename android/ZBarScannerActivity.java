@@ -136,6 +136,7 @@ implements SurfaceHolder.Callback {
 
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+            onBackPressed();
 
         }
         super.onCreate(savedInstanceState);

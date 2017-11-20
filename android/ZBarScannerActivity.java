@@ -136,6 +136,7 @@ implements SurfaceHolder.Callback {
 
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+            onBackPressed();
 
         }
         super.onCreate(savedInstanceState);
@@ -147,7 +148,9 @@ implements SurfaceHolder.Callback {
         super.onNewIntent(intent);
 
         try {
-            if (intent.getStringExtra("killExtra").contains("kill")) onBackPressed();
+            if (intent.getStringExtra("killExtra").contains("kill")) {
+                onBackPressed();
+            }
         } catch (Exception e) {
             //do nothing
         }
@@ -268,8 +271,8 @@ implements SurfaceHolder.Callback {
             }
         };
         scannerSurface.setLayoutParams(new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER
         ));
         scannerSurface.getHolder().addCallback(this);
@@ -588,32 +591,16 @@ implements SurfaceHolder.Callback {
     }
 
     private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
-        final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio=(double)w/h;
-
+        final double ASPECT_TOLERANCE = 0.001;
         if (sizes == null) return null;
-
         Camera.Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
 
-        int targetHeight = h;
-
         for (Camera.Size size : sizes) {
             double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
+            if (Math.min(Math.abs(size.width - w), Math.abs(size.height - h)) < minDiff && size.height <= h && size.width <= w) {
                 optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
-                }
+                minDiff = Math.min(Math.abs(size.width - w), Math.abs(size.height - h));
             }
         }
         

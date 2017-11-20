@@ -53,7 +53,7 @@ public class ZBar extends CordovaPlugin {
 
         } else if (action.equals("cancel")) {
             Intent killIntent = new Intent(appCtx, ZBarScannerActivity.class);
-            killIntent.putExtra("killExtra", true);
+            killIntent.putExtra("killExtra", "kill");
             cordova.getActivity().startActivity(killIntent);
             return true;
 

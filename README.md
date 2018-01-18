@@ -1,12 +1,9 @@
-**This repository is looking for a maintainer! If you believe you are the right person, please [leave a comment](https://github.com/tjwoon/csZBar/issues/60)!**
-
-
 
 # ZBar Barcode Scanner Plugin
 
 This plugin integrates with the [ZBar](http://zbar.sourceforge.net/) library,
-exposing a JavaScript interface for scanning barcodes (QR, 2D, etc).
-In this fork a button has been added to turn off and on device flash. In addition the plugin can now handle the device orientation change.
+exposing a JavaScript interface for scanning barcodes (QR, 2D, etc). This repo has been forked from [AshleyDeng's repository](https://github.com/AshleyDeng/csZBar)
+In this fork, the camera preview on Android is now in a window, defaulting to the top half of the screen. The camera preview is now also kept active, returning results continually instead of closing after one result returned. Lastly there is also now a cancel button in the window, allowing the preview to be closed either from the preview or from an external signal (back button, programmatically, etc).
 
 ## Installation
 
@@ -28,7 +25,7 @@ Arguments:
         text_instructions: "OPTIONAL Instruction Text - default = 'Please point your camera at the QR code.'", // Android only
         camera: "front" || "back" // defaults to "back"
         flash: "on" || "off" || "auto" // defaults to "auto". See Quirks
-        drawSight: true || false //defaults to true, create a red sight/line in the center of the scanner view.
+        height: 0.1-1.0 (Float) //defaults to 0.5, Android only
     }
     ```
 
@@ -39,6 +36,15 @@ Return:
 
 - success('scanned bar code') _Successful scan with value of scanned code_
 - error('cancelled') _If user cancelled the scan (with back button etc)_
+- error('misc error message') _Misc failure_
+
+### Scan barcode
+
+    cloudSky.zBar.cancel()
+
+Return:
+
+- success('cancelled') _Successfully cancelled_
 - error('misc error message') _Misc failure_
 
 Status:

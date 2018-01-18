@@ -107,7 +107,8 @@ implements SurfaceHolder.Callback {
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
-        
+        super.onCreate(savedInstanceState);
+
         try {
             if (this.getIntent().getStringExtra("killExtra").contains("kill")) {
                 Intent dieIntent = new Intent("scanner");
@@ -130,17 +131,12 @@ implements SurfaceHolder.Callback {
         int permissionCheck = ContextCompat.checkSelfPermission(this.getBaseContext(), Manifest.permission.CAMERA);
 
         if(permissionCheck == PackageManager.PERMISSION_GRANTED){
-
             if (!isCameraSetup)
             setUpCamera();
-
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             onBackPressed();
-
         }
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -584,7 +580,7 @@ implements SurfaceHolder.Callback {
                         // simple and stupid focus method, we get to turn the flash
                         // on during autofocus.
                 }
-            } catch (IOException e) {
+            } catch (IOException | NullPointerException e) {
                 die("Could not start camera preview: " + e.getMessage());
             }
         }

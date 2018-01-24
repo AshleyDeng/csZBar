@@ -580,7 +580,9 @@ implements SurfaceHolder.Callback {
                         // simple and stupid focus method, we get to turn the flash
                         // on during autofocus.
                 }
-            } catch (IOException | NullPointerException e) {
+            } catch (IOException e) {
+                die("Could not start camera preview: " + e.getMessage());
+            } catch (NullPointerException e) {
                 die("Could not start camera preview: " + e.getMessage());
             }
         }
